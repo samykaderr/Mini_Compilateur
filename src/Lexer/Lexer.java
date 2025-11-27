@@ -12,42 +12,41 @@ public class Lexer {
     public Lexer(String source) {
         this.source = source == null ? "" : source;
     }
-
-    private boolean isAtEnd() {
+//ici en ferifie si le fichier est vide donc nous somme a la fin .
+    private boolean silaFin() {
         return position >= source.length();
     }
-
+//ici on regarde le caractere courant
     private char peek() {
-        return isAtEnd() ? '\0' : source.charAt(position);
+        return silaFin() ? '\0' : source.charAt(position);
     }
 
-   // private char peekNext() {
-   //     return (position + 1) >= source.length() ? '\0' : source.charAt(position + 1);
-   // }
-
-    private char advance() {
+  
+//ici on avance au caractere suivant pour continuser 'analyser le fichier'
+    
+    private char avance() {
         char c = peek();
-        position++;
+        position++;//on vance la positon
         if (c == '\n') {
-            line++;
+            line++;//et ici en definit les cordonne exacte de le caractere
             column = 1;
         } else {
             column++;
         }
         return c;
     }
-
+//avec cette methode en saute les espaces blans ,_, , saut de lign ....
     private void skipWhitespace() {
-        while (!isAtEnd()) {
+        while (!silaFin()) {
             char c = peek();
             if (c == ' ' || c == '\r' || c == '\t' || c == '\n') {
-                advance();
+                avance();
             } else {
                 break;
             }
         }
     }
-
+//cette methode est la structure de donnee qui contient les mots cles du language
     private final Map<String, TokenType> keywords = new HashMap<>();
     {
         keywords.put("let", TokenType.LET);
@@ -79,55 +78,57 @@ public class Lexer {
 
     public Token nextToken() {
         skipWhitespace();
-        if (isAtEnd()) return new Token(TokenType.EOF, "", line, column);
+        if (silaFin()) return new Token(TokenType.EOF, "", line, column);
 
         int tokenLine = line;
         int tokenColumn = column;
 
-        char c = advance();
+        char c = avance();
 
-        // Identifiants et mots-clés
+        // verifier le type du caracter si il est un Identifiants et mots-clés
+        //Samy achouche cest des mot cle reserver a ne pas utiliseer comme cle dans e language
         if (Character.isLetter(c) || c == '_' || c == '$') {
             StringBuilder sb = new StringBuilder();
             sb.append(c);
             while (Character.isLetterOrDigit(peek()) || peek() == '_' || peek() == '$') {
-                sb.append(advance());
+                sb.append(avance());
             }
             String lexeme = sb.toString();
             TokenType type = keywords.get(lexeme.toLowerCase());
             if (type != null) return new Token(type, lexeme, tokenLine, tokenColumn);
-            return new Token(TokenType.IDENTIFIER, lexeme, tokenLine, tokenColumn);
+            return new Token(TokenType.ID, lexeme, tokenLine, tokenColumn);
         }
 
-        // Nombres (entiers et décimaux simples)
+        // ici en veifie c'est le caractere est un Nombres (entiers et décimaux simples)
+        //parce que js calsifie tout les chiffre et nombre sous le nom Number
         if (Character.isDigit(c)) {
             StringBuilder sb = new StringBuilder();
             sb.append(c);
-            while (Character.isDigit(peek())) sb.append(advance());
+            while (Character.isDigit(peek())) sb.append(avance());
             if (peek() == '.') {
-                sb.append(advance());
+                sb.append(avance());
                 if (!Character.isDigit(peek())) {
                     // point isolé -> revenir au comportement d'opérateur DOT
                     return new Token(TokenType.NUMBER, sb.toString(), tokenLine, tokenColumn);
                 }
-                while (Character.isDigit(peek())) sb.append(advance());
+                while (Character.isDigit(peek())) sb.append(avance());
             }
             return new Token(TokenType.NUMBER, sb.toString(), tokenLine, tokenColumn);
         }
 
-        // Chaînes
+        // ici en verifie si c'est un #String (guillemets simples ou doubles)
         if (c == '"' || c == '\'') {
             char quote = c;
             StringBuilder sb = new StringBuilder();
             sb.append(quote);
             boolean closed = false;
-            while (!isAtEnd()) {
-                char ch = advance();
+            while (!silaFin()) {
+                char ch = avance();
                 sb.append(ch);
                 if (ch == '\\') {
                     // échappement : prendre le caractère suivant s'il existe
-                    if (!isAtEnd()) {
-                        sb.append(advance());
+                    if (!silaFin()) {
+                        sb.append(avance());
                     }
                     continue;
                 }
@@ -145,26 +146,26 @@ public class Lexer {
             return new Token(TokenType.STRING, lexeme, tokenLine, tokenColumn);
         }
 
-        // Commentaires et opérateur /
+        // ici en rassure la gestion des commentaire Commentaires et opérateur /
         if (c == '/') {
             if (peek() == '/') {
                 // commentaire ligne
                 StringBuilder sb = new StringBuilder();
                 sb.append("//");
-                advance(); // consommer deuxième /
-                while (!isAtEnd() && peek() != '\n') sb.append(advance());
+                avance(); // consommer deuxième /
+                while (!silaFin() && peek() != '\n') sb.append(avance());
                 return new Token(TokenType.SINGLE_LINE_COMMENT, sb.toString(), tokenLine, tokenColumn);
             } else if (peek() == '*') {
                 // commentaire bloc
                 StringBuilder sb = new StringBuilder();
                 sb.append("/*");
-                advance(); // consommer '*'
+                avance(); // consommer '*'
                 boolean closed = false;
-                while (!isAtEnd()) {
-                    char ch = advance();
+                while (!silaFin()) {
+                    char ch = avance();
                     sb.append(ch);
                     if (ch == '*' && peek() == '/') {
-                        sb.append(advance()); // consommer '/'
+                        sb.append(avance()); // consommer '/'
                         closed = true;
                         break;
                     }
@@ -180,18 +181,18 @@ public class Lexer {
             }
         }
 
-        // Opérateurs multi-caractères et symboles simples
+        // la gestion des Opérateurs multi-caractères et symboles simples
         switch (c) {
             case '+':
-                if (peek() == '+') { advance(); return new Token(TokenType.INCREMENT, "++", tokenLine, tokenColumn); }
-                if (peek() == '=')  { advance(); return new Token(TokenType.PLUS_ASSIGN, "+=", tokenLine, tokenColumn); }
+                if (peek() == '+') { avance(); return new Token(TokenType.INCREMENT, "++", tokenLine, tokenColumn); }
+                if (peek() == '=')  { avance(); return new Token(TokenType.PLUS_ASSIGN, "+=", tokenLine, tokenColumn); }
                 return new Token(TokenType.PLUS, "+", tokenLine, tokenColumn);
             case '-':
-                if (peek() == '-') { advance(); return new Token(TokenType.DECREMENT, "--", tokenLine, tokenColumn); }
-                if (peek() == '=') { advance(); return new Token(TokenType.MINUS_ASSIGN, "-=", tokenLine, tokenColumn); }
+                if (peek() == '-') { avance(); return new Token(TokenType.DECREMENT, "--", tokenLine, tokenColumn); }
+                if (peek() == '=') { avance(); return new Token(TokenType.MINUS_ASSIGN, "-=", tokenLine, tokenColumn); }
                 return new Token(TokenType.MINUS, "-", tokenLine, tokenColumn);
             case '*':
-                if (peek() == '=') { advance(); return new Token(TokenType.MULTIPLY_ASSIGN, "*=", tokenLine, tokenColumn); }
+                if (peek() == '=') { avance(); return new Token(TokenType.MULTIPLY_ASSIGN, "*=", tokenLine, tokenColumn); }
                 return new Token(TokenType.MULTIPLY, "*", tokenLine, tokenColumn);
             case '%': return new Token(TokenType.MODULO, "%", tokenLine, tokenColumn);
             case ';': return new Token(TokenType.SEMICOLON, ";", tokenLine, tokenColumn);
@@ -204,22 +205,22 @@ public class Lexer {
             case '[' : return new Token(TokenType.LBRACKET, "[", tokenLine, tokenColumn);
             case ']' : return new Token(TokenType.RBRACKET, "]", tokenLine, tokenColumn);
             case '=':
-                if (peek() == '=') { advance(); if (peek() == '=') { advance(); return new Token(TokenType.EQUAL_EQUAL, "===", tokenLine, tokenColumn); } return new Token(TokenType.EQUAL_EQUAL, "==", tokenLine, tokenColumn); }
+                if (peek() == '=') { avance(); if (peek() == '=') { avance(); return new Token(TokenType.EQUAL_EQUAL, "===", tokenLine, tokenColumn); } return new Token(TokenType.EQUAL_EQUAL, "==", tokenLine, tokenColumn); }
                 return new Token(TokenType.ASSIGN, "=", tokenLine, tokenColumn);
             case '!':
-                if (peek() == '=') { advance(); if (peek() == '=') { advance(); return new Token(TokenType.NOT_EQUAL, "!==", tokenLine, tokenColumn); } return new Token(TokenType.NOT_EQUAL, "!=", tokenLine, tokenColumn); }
+                if (peek() == '=') { avance(); if (peek() == '=') { avance(); return new Token(TokenType.NOT_EQUAL, "!==", tokenLine, tokenColumn); } return new Token(TokenType.NOT_EQUAL, "!=", tokenLine, tokenColumn); }
                 return new Token(TokenType.LOGICAL_NOT, "!", tokenLine, tokenColumn);
             case '<':
-                if (peek() == '=') { advance(); return new Token(TokenType.LESS_EQUAL, "<=", tokenLine, tokenColumn); }
+                if (peek() == '=') { avance(); return new Token(TokenType.LESS_EQUAL, "<=", tokenLine, tokenColumn); }
                 return new Token(TokenType.LESS, "<", tokenLine, tokenColumn);
             case '>':
-                if (peek() == '=') { advance(); return new Token(TokenType.GREATER_EQUAL, ">=", tokenLine, tokenColumn); }
+                if (peek() == '=') { avance(); return new Token(TokenType.GREATER_EQUAL, ">=", tokenLine, tokenColumn); }
                 return new Token(TokenType.GREATER, ">", tokenLine, tokenColumn);
             case '&':
-                if (peek() == '&') { advance(); return new Token(TokenType.LOGICAL_AND, "&&", tokenLine, tokenColumn); }
+                if (peek() == '&') { avance(); return new Token(TokenType.LOGICAL_AND, "&&", tokenLine, tokenColumn); }
                 break;
             case '|':
-                if (peek() == '|') { advance(); return new Token(TokenType.LOGICAL_OR, "||", tokenLine, tokenColumn); }
+                if (peek() == '|') { avance(); return new Token(TokenType.LOGICAL_OR, "||", tokenLine, tokenColumn); }
                 break;
             default:
                 // caractère inconnu
@@ -228,11 +229,11 @@ public class Lexer {
                 return new Token(TokenType.INVALID_TOKEN, s, tokenLine, tokenColumn);
         }
 
-        // Par défaut: retourner EOF (ne devrait pas arriver)
+        // Par défaut: retourner EOF (ne devrait pas arriver)si sa arrive c'est la fin du fichier
         return new Token(TokenType.EOF, "", tokenLine, tokenColumn);
     }
 
-    // Récupérer tous les tokens (utilitaire)
+    // Récupérer tous les tokens
     public List<Token> getAllTokens() {
         List<Token> tokens = new ArrayList<>();
         Token t;
@@ -242,8 +243,10 @@ public class Lexer {
         } while (t.getType() != TokenType.EOF);
         return tokens;
     }
-
+    //un test simple pour verifier le lexer c'est facultatife sont execution
+    //juste un teste pendant le devellopement
     // main de test
+    /*
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("Usage: Lexer <source-file>");
@@ -264,5 +267,5 @@ public class Lexer {
         } catch (IOException e) {
             ErrorHandler.reportException(e);
         }
-    }
+    }*/
 }
