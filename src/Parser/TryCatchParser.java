@@ -10,15 +10,15 @@ public class TryCatchParser {
 
     public TryCatchParser(Lexer lexer) {
         this.lexer = lexer;
-        this.current = lexer.nextToken();
+        this.current = lexer.Tokensuivant();
     }
 
     // Avancer et regarder le prochain token (LL(1) : une seule entrée regardée)
-    private void advance() throws ParseException {
-        current = lexer.nextToken();
+    private void parcourire() throws ParseException {
+        current = lexer.Tokensuivant();
         // Ignorer les commentaires
         while (current.getType() == TokenType.SINGLE_LINE_COMMENT || current.getType() == TokenType.MULTI_LINE_COMMENT) {
-            current = lexer.nextToken();
+            current = lexer.Tokensuivant();
         }
         if (current.getType() == TokenType.INVALID_TOKEN) {
             ParseException pe = new ParseException("Erreur lexicale: " + current.getValue(), current.getLine(), current.getColumn());
@@ -28,12 +28,12 @@ public class TryCatchParser {
         }
     }
 
-    private boolean check(TokenType type) {
+    private boolean verifierType(TokenType type) {
         return current.getType() == type;
     }
 
     // Lance une ParseException détaillée en indiquant le token trouvé et sa valeur
-    private void errorExpected(String expected) throws ParseException {
+    private void erreurAttendu(String expected) throws ParseException {
         ParseException pe = new ParseException("Attendu " + expected + " mais trouvé " + current.getType() + " ('" + current.getValue() + "')", current.getLine(), current.getColumn());
         ErrorHandler.reportError(pe.getMessage(), pe.getLine(), pe.getColumn());
         ErrorHandler.diagnose(pe);
@@ -49,14 +49,14 @@ public class TryCatchParser {
     }
 
     private void expect(TokenType type) throws ParseException {
-        if (!check(type)) {
-            errorExpected("'" + type + "'");
+        if (!verifierType(type)) {
+            erreurAttendu("'" + type + "'");
         }
-        advance();
+        parcourire();
     }
 
-    // Entrée principale : analyse tout le programme
-    public void parseAll() throws ParseException {
+    // Entrée principale : analyse tout le programme et detecter les erreurs try/catch
+    public void anlysertoust() throws ParseException {
         if (current.getType() == TokenType.INVALID_TOKEN) {
             ParseException pe = new ParseException("Erreur lexicale: " + current.getValue(), current.getLine(), current.getColumn());
             ErrorHandler.reportError(pe.getMessage(), pe.getLine(), pe.getColumn());
@@ -65,7 +65,7 @@ public class TryCatchParser {
         }
         // Si le token initial est un commentaire, avancer jusqu'au premier token significatif
         while (current.getType() == TokenType.SINGLE_LINE_COMMENT || current.getType() == TokenType.MULTI_LINE_COMMENT) {
-            advance();
+            parcourire();
         }
         parseProgram();
     }
@@ -79,43 +79,43 @@ public class TryCatchParser {
 
     // Statement -> TryStatement | other (ignored)
     private void parseStatement() throws ParseException {
-        if (check(TokenType.TRY)) {
+        if (verifierType(TokenType.TRY)) {
             parseTryStatement();
-        } else if (check(TokenType.LET) || check(TokenType.VAR) || check(TokenType.CONST)) {
+        } else if (verifierType(TokenType.LET) || verifierType(TokenType.VAR) || verifierType(TokenType.CONST)) {
             parseVariableDeclaration();
-        } else if (check(TokenType.LBRACE)) {
+        } else if (verifierType(TokenType.LBRACE)) {
             parseBlock();
-        } else if (check(TokenType.IDENTIFIER)) {
+        } else if (verifierType(TokenType.ID)) {
             // Could be an assignment or a function call
             parseExpressionStatement();
-        } else if (check(TokenType.SEMICOLON)) {
+        } else if (verifierType(TokenType.SEMICOLON)) {
             // Empty statement
-            advance();
+            parcourire();
         }
         else {
             // Ignorer les autres types de statements pour le moment
-            advance();
+            parcourire();
         }
     }
 
     private void parseExpressionStatement() throws ParseException {
         parseExpression();
-        if(check(TokenType.SEMICOLON)){
+        if(verifierType(TokenType.SEMICOLON)){
             expect(TokenType.SEMICOLON);
         }
     }
 
 
     private void parseVariableDeclaration() throws ParseException {
-        advance(); // Consume 'let', 'var', or 'const'
-        expect(TokenType.IDENTIFIER);
-        if (check(TokenType.ASSIGN)) {
-            advance();
+        parcourire(); // Consomer 'let', 'var', or 'const'
+        expect(TokenType.ID);
+        if (verifierType(TokenType.ASSIGN)) {
+            parcourire();
             parseExpression();
         }
-        // Semicolon is optional here
-        if(check(TokenType.SEMICOLON)){
-            advance();
+
+        if(verifierType(TokenType.SEMICOLON)){
+            parcourire();
         }
     }
 
@@ -127,8 +127,8 @@ public class TryCatchParser {
     private void parseAssignment() throws ParseException {
         parseComparison(); // Higher precedence
 
-        if (check(TokenType.ASSIGN)) {
-            advance(); // consume '='
+        if (verifierType(TokenType.ASSIGN)) {
+            parcourire(); // consume '='
             parseAssignment(); // Right-associative
         }
     }
@@ -137,16 +137,16 @@ public class TryCatchParser {
         parsePrimary(); // Higher precedence
 
         while (isComparisonOperator(current.getType())) {
-            advance();
+            parcourire();
             parsePrimary();
         }
     }
 
     private void parsePrimary() throws ParseException {
-        if (check(TokenType.IDENTIFIER) || check(TokenType.NUMBER) || check(TokenType.STRING) || check(TokenType.TRUE) || check(TokenType.FALSE)) {
-            advance();
-        } else if (check(TokenType.LPAREN)) {
-            advance();
+        if (verifierType(TokenType.ID) || verifierType(TokenType.NUMBER) || verifierType(TokenType.STRING) || verifierType(TokenType.TRUE) || verifierType(TokenType.FALSE)) {
+            parcourire();
+        } else if (verifierType(TokenType.LPAREN)) {
+            parcourire();
             parseExpression();
             expect(TokenType.RPAREN);
         } else {
@@ -178,14 +178,14 @@ public class TryCatchParser {
         parseBlock();
 
         // Catch obligatoire en JS (à la forme try { } catch (e) { } )
-        if (!check(TokenType.CATCH)) {
+        if (!verifierType(TokenType.CATCH)) {
             error("Après 'try' attendu 'catch'");
         }
 
         parseCatchClause();
 
         // Finally optionnel
-        if (check(TokenType.FINALLY)) {
+        if (verifierType(TokenType.FINALLY)) {
             parseFinallyClause();
         }
     }
@@ -196,7 +196,7 @@ public class TryCatchParser {
         expect(TokenType.LPAREN);
 
         // Cas explicite: catch ()
-        if (check(TokenType.RPAREN)) {
+        if (verifierType(TokenType.RPAREN)) {
             // On pointe sur la parenthèse fermante : le message indique qu'on a trouvé ')' sans identifiant
             ParseException pe = new ParseException("Paramètre de 'catch' manquant (identifiant attendu) — parenthèses vides", current.getLine(), current.getColumn());
             ErrorHandler.reportError(pe.getMessage(), pe.getLine(), pe.getColumn());
@@ -204,10 +204,10 @@ public class TryCatchParser {
             throw pe;
         }
 
-        if (!check(TokenType.IDENTIFIER)) {
+        if (!verifierType(TokenType.ID)) {
             error("Paramètre de 'catch' attendu (identifiant)");
         }
-        advance(); // consommer l'identifiant
+        parcourire(); // consommer l'identifiant
 
         expect(TokenType.RPAREN);
 
@@ -224,25 +224,12 @@ public class TryCatchParser {
     // BlockBody is implemented via simple brace counting pour accepter n'importe quel contenu
     private void parseBlock() throws ParseException {
         expect(TokenType.LBRACE);
-        while (!check(TokenType.RBRACE) && !check(TokenType.EOF)) {
+        while (!verifierType(TokenType.RBRACE) && !verifierType(TokenType.EOF)) {
             parseStatement();
         }
         expect(TokenType.RBRACE);
     }
 
-    // Méthode simple de synchronisation (non utilisée dans la version actuelle, fournie pour extension)
-    // Synchronize to next token that can start a statement or EOF
-    private void synchronize() {
-        while (current.getType() != TokenType.EOF) {
-            if (current.getType() == TokenType.TRY || current.getType() == TokenType.RBRACE || current.getType() == TokenType.SEMICOLON) {
-                return;
-            }
-            try {
-                advance();
-            } catch (ParseException e) {
-                // En cas d'erreur lexicale lors de la synchronisation, on arrête la synchronisation
-                return;
-            }
-        }
-    }
+
+
 }

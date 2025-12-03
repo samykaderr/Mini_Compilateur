@@ -13,7 +13,7 @@ public class TestParser {
         Lexer lexer = new Lexer(content);
         TryCatchParser parser = new TryCatchParser(lexer);
         try {
-            parser.parseAll();
+            parser.anlysertoust();
             System.out.println("Aucune erreur de syntaxe try/catch détectée.");
         } catch (ParseException pe) {
             // Utiliser le nouveau ErrorHandler pour afficher des informations enrichies

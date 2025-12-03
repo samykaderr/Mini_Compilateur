@@ -10,7 +10,7 @@ import java.util.Locale;
 public class ErrorHandler {
     // Affiche une erreur avec position
     public static void reportError(String message, int line, int column) {
-        System.err.printf("Erreur de parsing (ligne %d, colonne %d): %s%n", line, column, message);
+        System.err.printf("Erreur de Synthaxiqque (ligne %d, colonne %d): %s%n", line, column, message);
     }
 
     // Affiche une explication/diagnostic succinct basé sur le message d'erreur
@@ -41,14 +41,7 @@ public class ErrorHandler {
         System.out.println("Explication: Vérifiez la syntaxe à l'endroit indiqué. Message: " + pe.getMessage());
     }
 
-    // Affiche une courte explication libre
-    public static void explain(String shortMessage) {
-        System.out.println("Explication: " + shortMessage);
-    }
 
-    // Affiche une exception inattendue (pile d'appels) pour le debug
-    public static void reportException(Exception e) {
-        System.err.println("Exception inattendue dans le parser: " + e.getMessage());
-        e.printStackTrace(System.err);
-    }
+
+
 }

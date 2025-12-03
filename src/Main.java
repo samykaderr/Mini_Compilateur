@@ -1,5 +1,3 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
 import Lexer.*;
 import Parser.TryCatchParser;
@@ -26,19 +24,15 @@ public class Main {
             }
 
             // Créer le lexer
-            Lexer lexer = new Lexer(new String(Files.readAllBytes(path)));
+            Lexer lexer;
 
-            // Optionnel: afficher les tokens (décommenter si nécessaire)
-            // for (Token token : lexer.getAllTokens()) {
-            //     System.out.println(token);
-            // }
 
             // Re-créer un lexer pour le parser (car getAllTokens aurait consommé tout)
             lexer = new Lexer(new String(Files.readAllBytes(path)));
 
             TryCatchParser parser = new TryCatchParser(lexer);
             try {
-                parser.parseAll();
+                parser.anlysertoust();
                 System.out.println("Analyse réussie: aucune erreur de syntaxe try/catch détectée.");
             } catch (ParseException pe) {
                 System.err.printf("Erreur de syntaxe: %s (ligne %d, colonne %d)\n", pe.getMessage(), pe.getLine(), pe.getColumn());
@@ -50,3 +44,4 @@ public class Main {
         }
     }
 }
+

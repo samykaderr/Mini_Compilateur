@@ -5,16 +5,17 @@ public enum TokenType {
     IF, ELSE, WHILE, DO, FOR,
     TRY, CATCH, FINALLY, THROW,
     TRUE, FALSE, NULL, UNDEFINED,
-    CONSOLE, LOG, // Ordre modifié et formatage corrigé
+    CONSOLE, LOG,
 
     // Mots-clés personnalisés (nom et prénom de l'étudiant)
+    //jai utiliser just ,my first name (Adblekader) est le middle name .
     SAMY, ACHOUCHE,
 
 
     // Identifiants et littéraux
-    IDENTIFIER,
-    NUMBER,
-    STRING,
+    ID,//les identifiant des variable
+    NUMBER,//type de varible nuerique
+    STRING,//chaine de caracter
 
     // Opérateurs
     PLUS, MINUS, MULTIPLY, DIVIDE, MODULO,

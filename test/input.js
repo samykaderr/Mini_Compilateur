@@ -1,4 +1,5 @@
-/*console.log("Avant try");
+//le premie cas son errreur
+console.log("Avant try");
 try{
     console.log("dans try");
     let a = 1;
@@ -7,7 +8,8 @@ try{
 } finally {
     console.log("toujours");
 }
-console.log("Après try");*/
+console.log("Après try");
+//exemple avec erreur
 function verifier() {
   try {
         var x = 100;
@@ -19,3 +21,17 @@ function verifier() {
         return 0;
     }
 }
+//exemple utilisant seulemt try/catch
+function test() {
+    try {
+        console.log("Début du bloc try");
+        let result = 10 / 0; // Ceci ne lance pas d'erreur en JavaScript
+        console.log("Résultat:", result);
+    } catch (error) {
+        console.log("Erreur attrapée:", error.message);
+    }
+    console.log("Fin de la fonction test");
+}
+//appel des fonctions
+verifier();
+test();
