@@ -11,7 +11,7 @@ try{
 console.log("Après try");
 //exemple avec erreur
 function verifier() {
-  try {
+    try {
         var x = 100;
         SAMY = x + 1;
         if (x > 10) throw Trop grand;
