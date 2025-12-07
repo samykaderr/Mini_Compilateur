@@ -66,7 +66,8 @@ public class Lexer {
         Map.entry("console", TokenType.CONSOLE),
         Map.entry("log", TokenType.LOG),
         Map.entry("samy", TokenType.SAMY),
-        Map.entry("achouche", TokenType.ACHOUCHE)
+        Map.entry("achouche", TokenType.ACHOUCHE),
+        Map.entry("abdelkader", TokenType.ABDELKADER)
     );
 
     public Token Tokensuivant() {

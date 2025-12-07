@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 
 public class TestParser {
     public static void main(String[] args) throws Exception {
-        String path = (args.length == 0) ? "test\\input.js" : args[0];
+        String path = (args.length == 0) ? "src/test/input.js" : args[0];
         String content = new String(Files.readAllBytes(Paths.get(path)));
         Lexer lexer = new Lexer(content);
         TryCatchParser parser = new TryCatchParser(lexer);

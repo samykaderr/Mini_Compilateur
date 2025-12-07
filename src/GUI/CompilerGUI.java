@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class CompilerGUI extends JFrame {
 
     private final JTextArea codeTextArea;
     private final JTextArea consoleTextArea;
+    private final JFileChooser fileChooser;
 
     public CompilerGUI() {
         super("Analyseur  Try-Catch en Java Script");
@@ -57,13 +57,14 @@ public class CompilerGUI extends JFrame {
         System.setErr(printStream);
 
         // --- Actions ---
-        testFileButton.addActionListener(event -> chooseAndTestFile());
-        testCodeButton.addActionListener(event -> testEditorCode());
-        clearButton.addActionListener(event -> clearFields());
+        testFileButton.addActionListener(e -> chooseAndTestFile());
+        testCodeButton.addActionListener(e -> testEditorCode());
+        clearButton.addActionListener(e -> clearFields());
+
+        fileChooser = new JFileChooser();
     }
 
     private void chooseAndTestFile() {
-        JFileChooser fileChooser = new JFileChooser();
         // Proposer le répertoire du projet comme point de départ
         fileChooser.setCurrentDirectory(new java.io.File("."));
         int result = fileChooser.showOpenDialog(this);
@@ -124,4 +125,3 @@ public class CompilerGUI extends JFrame {
         }
     }
 }
-

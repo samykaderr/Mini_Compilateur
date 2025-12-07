@@ -8,8 +8,8 @@ public enum TokenType {
     CONSOLE, LOG,
 
     // Mots-clés personnalisés (nom et prénom de l'étudiant)
-    //jai utiliser just ,my first name (Adblekader) est le middle name .
-    SAMY, ACHOUCHE,
+
+    SAMY, ACHOUCHE,ABDELKADER,
 
 
     // Identifiants et littéraux

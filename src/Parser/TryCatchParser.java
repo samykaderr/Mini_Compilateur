@@ -77,8 +77,13 @@ public class TryCatchParser {
         }
     }
 
+
     // Statement -> TryStatement | other (ignored)
     private void parseStatement() throws ParseException {
+        if (verifierType(TokenType.SAMY) || verifierType(TokenType.ACHOUCHE) || verifierType(TokenType.ABDELKADER)) {
+            error("Mot-clé non autorisé trouvé comme instruction");
+        }
+
         if (verifierType(TokenType.TRY)) {
             parseTryStatement();
         } else if (verifierType(TokenType.LET) || verifierType(TokenType.VAR) || verifierType(TokenType.CONST)) {
@@ -97,6 +102,7 @@ public class TryCatchParser {
             parcourire();
         }
     }
+
 
     private void parseExpressionStatement() throws ParseException {
         parseExpression();
@@ -221,7 +227,7 @@ public class TryCatchParser {
     }
 
     // Block -> '{' BlockBody '}'
-    // BlockBody is implemented via simple brace counting pour accepter n'importe quel contenu
+
     private void parseBlock() throws ParseException {
         expect(TokenType.LBRACE);
         while (!verifierType(TokenType.RBRACE) && !verifierType(TokenType.EOF)) {
