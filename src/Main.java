@@ -1,12 +1,12 @@
 
-import GUI.CompilerGUI;
+import GUI.IDEGUI;
 
 import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            CompilerGUI gui = new CompilerGUI();
+            IDEGUI gui = new IDEGUI();
             gui.setVisible(true);
         });
     }

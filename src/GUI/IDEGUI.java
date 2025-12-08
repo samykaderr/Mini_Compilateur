@@ -11,13 +11,13 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 
-public class CompilerGUI extends JFrame {
+public class IDEGUI extends JFrame {
 
     private final JTextArea codeTextArea;
     private final JTextArea consoleTextArea;
     private final JFileChooser fileChooser;
 
-    public CompilerGUI() {
+    public IDEGUI() {
         super("Analyseur  Try-Catch en Java Script");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
