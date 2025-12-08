@@ -125,13 +125,13 @@ public class TryCatchParser {
         }
     }
 
-    // New expression parsing hierarchy
+
     private void parseExpression() throws ParseException {
         parseAssignment();
     }
 
     private void parseAssignment() throws ParseException {
-        parseComparison(); // Higher precedence
+        parseComparison();
 
         if (verifierType(TokenType.ASSIGN)) {
             parcourire(); // consume '='
@@ -147,7 +147,7 @@ public class TryCatchParser {
             parsePrimary();
         }
     }
-
+    // Primary -> IDENTIFIER | NUMBER | STRING | 'true' | 'false' | '(' Expression ')'
     private void parsePrimary() throws ParseException {
         if (verifierType(TokenType.ID) || verifierType(TokenType.NUMBER) || verifierType(TokenType.STRING) || verifierType(TokenType.TRUE) || verifierType(TokenType.FALSE)) {
             parcourire();
@@ -176,7 +176,7 @@ public class TryCatchParser {
         }
     }
 
-    // TryStatement -> 'try' Block CatchClause FinallyClause?
+    // Try -> 'try' Block Catch Finally? le ? veut dire que c'est optionnel
     private void parseTryStatement() throws ParseException {
         // current == TRY
         expect(TokenType.TRY);
@@ -196,7 +196,7 @@ public class TryCatchParser {
         }
     }
 
-    // CatchClause -> 'catch' '(' IDENTIFIER ')' Block
+    // Catch -> 'catch' '(' IDENTIFIER ')' Block
     private void parseCatchClause() throws ParseException {
         expect(TokenType.CATCH);
         expect(TokenType.LPAREN);
@@ -220,7 +220,7 @@ public class TryCatchParser {
         parseBlock();
     }
 
-    // FinallyClause -> 'finally' Block
+    // Finally-> 'finally' Block
     private void parseFinallyClause() throws ParseException {
         expect(TokenType.FINALLY);
         parseBlock();

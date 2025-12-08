@@ -1,6 +1,7 @@
 package GUI;
 
 import Lexer.Lexer;
+import Lexer.Token;
 import Parser.ParseException;
 import Parser.TryCatchParser;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.util.List;
 
 public class IDEGUI extends JFrame {
 
@@ -52,19 +54,19 @@ public class IDEGUI extends JFrame {
         add(splitPane);
 
         // --- Redirect Console Output ---
-        PrintStream printStream = new PrintStream(new CustomOutputStream(consoleTextArea));
+        PrintStream printStream = new PrintStream(new affichage(consoleTextArea));
         System.setOut(printStream);
         System.setErr(printStream);
 
         // --- Actions ---
-        testFileButton.addActionListener(e -> chooseAndTestFile());
-        testCodeButton.addActionListener(e -> testEditorCode());
-        clearButton.addActionListener(e -> clearFields());
+        testFileButton.addActionListener(e -> choisirefichier ());
+        testCodeButton.addActionListener(e -> testercode ());
+        clearButton.addActionListener(e -> supprimer ());
 
         fileChooser = new JFileChooser();
     }
 
-    private void chooseAndTestFile() {
+    private void choisirefichier () {
         // Proposer le répertoire du projet comme point de départ
         fileChooser.setCurrentDirectory(new java.io.File("."));
         int result = fileChooser.showOpenDialog(this);
@@ -81,12 +83,12 @@ public class IDEGUI extends JFrame {
         }
     }
 
-    private void clearFields() {
+    private void supprimer () {
         codeTextArea.setText("");
         consoleTextArea.setText("");
     }
 
-    private void testEditorCode() {
+    private void testercode () {
         String code = codeTextArea.getText();
         if (code.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "La zone de code est vide.", "Avertissement", JOptionPane.WARNING_MESSAGE);
@@ -98,8 +100,18 @@ public class IDEGUI extends JFrame {
 
     private void analyzeCode(String code) {
         try {
-            Lexer lexer = new Lexer(code);
-            TryCatchParser parser = new TryCatchParser(lexer);
+            // analyse lexicale et affichage des tokens
+            Lexer tokenLexer = new Lexer(code);
+            List<Token> tokens = tokenLexer.getAllTokens();
+            System.out.println("--- Tokens ---");
+            for (Token token : tokens) {
+                System.out.println(token);
+            }
+            System.out.println("\n--- Analyse Syntaxique ---");
+
+            // analyse synthaxique et détection des erreurs try/catch
+            Lexer parserLexer = new Lexer(code); 
+            TryCatchParser parser = new TryCatchParser(parserLexer);
             parser.anlysertoust();
             System.out.println("Analyse réussie: aucune erreur de syntaxe try/catch détectée.");
         } catch (ParseException pe) {
@@ -109,18 +121,19 @@ public class IDEGUI extends JFrame {
         }
     }
 
-    public static class CustomOutputStream extends OutputStream {
+    public static class affichage extends OutputStream {
         private final JTextArea textArea;
 
-        public CustomOutputStream(JTextArea textArea) {
+        public affichage(JTextArea textArea) {
+            
             this.textArea = textArea;
         }
 
         @Override
         public void write(int b) {
-            // redirects data to the text area
+            // mettre les donne dans le text area
             textArea.append(String.valueOf((char)b));
-            // scrolls the text area to the end of data
+            // rassurer que il prend tout le code inssererdans le ide
             textArea.setCaretPosition(textArea.getDocument().getLength());
         }
     }
